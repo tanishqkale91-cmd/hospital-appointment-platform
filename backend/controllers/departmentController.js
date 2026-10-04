@@ -1,0 +1,68 @@
+const Department = require('../models/Department');
+const { HttpError, asyncHandler } = require('../middlewares/errorHandler');
+const { isValidObjectId } = require('../utils/validators');
+
+// GET /api/departments  (public, active only)
+const listDepartments = asyncHandler(async (req, res) => {
+  const departments = await Department.find({ isActive: true }).sort({ name: 1 });
+  res.status(200).json({ success: true, message: 'Departments retrieved', data: departments });
+});
+
+// GET /api/departments/all  (admin, includes inactive)
+const listAllDepartments = asyncHandler(async (req, res) => {
+  const departments = await Department.find().sort({ name: 1 });
+  res.status(200).json({ success: true, message: 'Departments retrieved', data: departments });
+});
+
+// GET /api/departments/:id
+const getDepartment = asyncHandler(async (req, res) => {
+  if (!isValidObjectId(req.params.id)) throw new HttpError(400, 'Invalid department id');
+  const department = await Department.findById(req.params.id);
+  if (!department) throw new HttpError(404, 'Department not found');
+  res.status(200).json({ success: true, message: 'Department retrieved', data: department });
+});
+
+// POST /api/departments  (admin)
+const createDepartment = asyncHandler(async (req, res) => {
+  const { name, description } = req.body;
+  if (!name || !String(name).trim()) throw new HttpError(400, 'Department name is required');
+  const exists = await Department.findOne({ name: new RegExp(`^${String(name).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') });
+  if (exists) throw new HttpError(409, 'Department already exists');
+  const department = await Department.create({ name, description });
+  res.status(201).json({ success: true, message: 'Department created', data: department });
+});
+
+// PUT /api/departments/:id  (admin)
+const updateDepartment = asyncHandler(async (req, res) => {
+  if (!isValidObjectId(req.params.id)) throw new HttpError(400, 'Invalid department id');
+  const department = await Department.findById(req.params.id);
+  if (!department) throw new HttpError(404, 'Department not found');
+  const { name, description, isActive } = req.body;
+  if (name !== undefined) {
+    if (!String(name).trim()) throw new HttpError(400, 'Department name cannot be empty');
+    department.name = name;
+  }
+  if (description !== undefined) department.description = description;
+  if (isActive !== undefined) department.isActive = Boolean(isActive);
+  await department.save();
+  res.status(200).json({ success: true, message: 'Department updated', data: department });
+});
+
+// DELETE /api/departments/:id  (admin) - soft delete
+const deactivateDepartment = asyncHandler(async (req, res) => {
+  if (!isValidObjectId(req.params.id)) throw new HttpError(400, 'Invalid department id');
+  const department = await Department.findById(req.params.id);
+  if (!department) throw new HttpError(404, 'Department not found');
+  department.isActive = false;
+  await department.save();
+  res.status(200).json({ success: true, message: 'Department deactivated', data: department });
+});
+
+module.exports = {
+  listDepartments,
+  listAllDepartments,
+  getDepartment,
+  createDepartment,
+  updateDepartment,
+  deactivateDepartment,
+};
