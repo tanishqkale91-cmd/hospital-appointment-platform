@@ -1,117 +1,108 @@
-# Hospital Appointment Allocation Platform (SIH260136)
+# Hospital Appointment Allocation Platform
 
-A full-stack MERN application for managing hospital departments, doctor profiles, doctor availability windows, appointment scheduling, and automated patient waiting lists.
+**SIH Problem Statement:** SIH260136 — Hospital Appointment Allocation Platform
 
----
+A full-stack MERN application for managing hospital departments, doctor profiles, doctor availability, appointment scheduling, and patient waiting lists.
+
+## Live Deployment
+
+- **Frontend:** https://hospital-appointment-platform-front.vercel.app
+- **Login:** https://hospital-appointment-platform-front.vercel.app/login
+- **Backend API:** https://hospital-appointment-platform.onrender.com
+- **Health check:** https://hospital-appointment-platform.onrender.com/api/health
+
+> The health endpoint reports whether the API and its MongoDB connection are available. If the backend URL changes, update the links above.
 
 ## Problem Statement
-**SIH260136 — Hospital Appointment Allocation Platform**
 
-Hospitals often struggle with inefficient scheduling, slot conflicts, and underutilized appointment capacity when bookings are cancelled. This platform provides a clean baseline system that enables:
-- **Patients** to search for doctors by department/specialization, view real-time availability slots, book appointments, manage their schedule, and join a waiting list when slots are full.
-- **Doctors** to publish custom availability windows, view upcoming appointments, complete consultations, and manage their profile.
-- **Administrators** to oversee system operations, manage departments, doctors, and patients, view global appointment schedules, and inspect waiting lists.
-- **Backend conflict prevention** to guarantee that double-booking for the same doctor, date, and time slot is impossible at the database level.
-- **Automated waiting list reassignment** to automatically offer freed slots to eligible waiting patients when an existing booking is cancelled.
+Hospitals can struggle with inefficient scheduling, conflicting bookings, and underused appointment capacity when bookings are cancelled. This platform aims to provide a baseline system for patients, doctors, and administrators to manage appointments and availability.
 
----
+- **Patients** can find doctors, view available slots, book appointments, manage appointments, and join waiting lists.
+- **Doctors** can publish availability, view appointments, and manage their profiles.
+- **Administrators** can manage departments, doctors, patients, appointments, and waiting lists.
+- **Conflict prevention** uses database-level appointment constraints to prevent duplicate bookings for the same doctor, date, and time slot.
+- **Waiting-list reassignment** is designed to offer newly freed slots to eligible waiting patients after cancellation.
 
 ## Tech Stack
 
-- **Frontend**: React (Vite), React Router v7, Tailwind CSS v4, Axios
-- **Backend**: Node.js, Express.js, MongoDB (Mongoose), JWT, bcryptjs
-- **Database**: MongoDB (Local or MongoDB Atlas)
+### Frontend
+- React
+- Vite
+- React Router v7
+- Tailwind CSS v4
+- Axios
 
----
+### Backend
+- Node.js
+- Express.js
+- Mongoose
+- JSON Web Tokens (JWT)
+- bcryptjs
+- CORS
+
+### Database
+- MongoDB, local or MongoDB Atlas
 
 ## Features
 
-### Authentication & Authorization
-- Secure JWT-based authentication for Patients, Doctors, and Administrators.
-- Password hashing with `bcryptjs`.
-- Sensitive fields (passwords) are excluded from API responses.
-- Role-based authorization middleware protecting endpoints and frontend routes.
+### Authentication and Authorization
+- JWT-based authentication for patients, doctors, and administrators.
+- Password hashing using `bcryptjs`.
+- Passwords excluded from API responses.
+- Role-based middleware for protected endpoints.
 
 ### Patient Portal
-- **Dashboard**: View statistics (upcoming, completed, cancelled appointments, waiting list status).
-- **Find Doctors**: Search by name, filter by department or specialization.
-- **View Slots**: Live availability slot generation (30 min / customizable duration).
-- **Book Appointment**: Real-time slot validation to prevent past or duplicate bookings.
-- **My Appointments**: Filter by status, view detailed info, and cancel bookings.
-- **Waiting List**: Join a waiting list when a doctor's date is fully booked; auto-assigned on slot cancellation.
-- **Profile Management**: Update contact info, date of birth, blood group, address.
+- Patient dashboard and appointment statistics.
+- Search for doctors by name, department, or specialization.
+- View generated availability slots.
+- Book appointments with validation against past or duplicate bookings.
+- View, filter, and cancel appointments.
+- Join and view waiting-list entries.
+- Manage profile information.
 
 ### Doctor Portal
-- **Dashboard**: Today's schedule, upcoming appointments count, waiting patient count.
-- **Manage Availability**: Add, update, or remove working time windows with custom slot durations.
-- **Manage Appointments**: Filter appointments by date and status, add consultation notes, mark completed/cancelled.
-- **Doctor Profile**: Update bio, consultation fees, experience, and qualifications.
+- View daily and upcoming appointment information.
+- Create and manage availability windows and slot durations.
+- Filter appointments and update consultation status.
+- Manage doctor profile details.
 
 ### Admin Portal
-- **System Statistics**: Overview of total patients, active doctors, departments, appointment counts, and waiting list metrics.
-- **Department Management**: Create, update, and deactivate hospital departments.
-- **Doctor Management**: Onboard new doctors, edit profiles, assign departments, and toggle active status.
-- **Patient Management**: Search patient records, toggle user account active status.
-- **Appointments & Waiting Lists**: Monitor all system appointments and waiting list queues.
+- View system statistics.
+- Create, update, and deactivate departments.
+- Onboard and manage doctor profiles.
+- Search patients and manage account status.
+- Review appointments and waiting lists.
 
----
+> Feature descriptions reflect the supplied project documentation. Confirm behavior against the current implementation when testing or contributing.
 
 ## Project Structure
 
-```
+```text
 hospital-appointment-platform/
 ├── backend/
 │   ├── config/
-│   │   └── db.js                 # MongoDB connection logic
+│   │   └── db.js
 │   ├── controllers/
-│   │   ├── appointmentController.js
-│   │   ├── authController.js
-│   │   ├── availabilityController.js
-│   │   ├── departmentController.js
-│   │   ├── doctorController.js
-│   │   ├── patientController.js
-│   │   ├── userController.js
-│   │   └── waitingListController.js
 │   ├── middlewares/
-│   │   ├── authMiddleware.js     # Bearer token verification
-│   │   ├── errorHandler.js       # Centralized error handler
-│   │   └── roleMiddleware.js     # Role authorization guard
 │   ├── models/
-│   │   ├── Appointment.js        # Holds unique compound partial index
-│   │   ├── Availability.js
-│   │   ├── Department.js
-│   │   ├── Doctor.js
-│   │   ├── User.js
-│   │   └── WaitingList.js
 │   ├── routes/
-│   │   ├── appointmentRoutes.js
-│   │   ├── authRoutes.js
-│   │   ├── availabilityRoutes.js
-│   │   ├── departmentRoutes.js
-│   │   ├── doctorRoutes.js
-│   │   ├── healthRoutes.js
-│   │   ├── patientRoutes.js
-│   │   ├── userRoutes.js
-│   │   └── waitingListRoutes.js
-│   ├── utils/
-│   │   ├── generateToken.js
-│   │   └── validators.js
 │   ├── scripts/
-│   │   └── seed.js               # Initial admin & department seeder
+│   │   └── seed.js
+│   ├── utils/
 │   ├── .env.example
 │   ├── package.json
 │   └── server.js
 ├── frontend/
 │   ├── public/
 │   ├── src/
-│   │   ├── api/                  # Axios instance & domain API methods
-│   │   ├── components/           # UI components (admin, appointments, common, doctors)
-│   │   ├── context/              # AuthContext provider
-│   │   ├── hooks/                # Custom hooks (useAuth, useFetch)
-│   │   ├── pages/                # Auth, Patient, Doctor, Admin pages
-│   │   ├── utils/                # Date/time formatters & validators
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── utils/
 │   │   ├── App.jsx
-│   │   ├── index.css             # Tailwind v4 configuration & styles
+│   │   ├── index.css
 │   │   └── main.jsx
 │   ├── .env.example
 │   ├── index.html
@@ -121,122 +112,195 @@ hospital-appointment-platform/
 └── README.md
 ```
 
----
+## Deployment
 
-## Prerequisites
+The frontend and backend are deployed separately.
 
-- **Node.js**: `v18.x` or later
-- **npm**: `v9.x` or later
-- **MongoDB**: Local MongoDB instance (`mongodb://127.0.0.1:27017/hospital_appointments`) or MongoDB Atlas connection string.
+| Component | Platform | Root directory | Build command | Run/publish setting |
+|---|---|---|---|---|
+| Frontend | Vercel | `frontend` | `npm run build` | Output directory: `dist` |
+| Backend | Render | `backend` | `npm ci` | Start command: `npm start` |
+| Database | MongoDB Atlas | — | — | Connection via `MONGO_URI` |
 
----
+### Frontend environment variable
 
-## Installation & Setup
+Set this in Vercel project settings for Production (and Preview only if appropriate):
+
+```env
+VITE_API_URL=https://hospital-appointment-platform.onrender.com/api
+```
+
+Vite embeds `VITE_` variables during the build. Redeploy the frontend after changing this value.
+
+### Backend environment variables
+
+Set these in the Render backend service's Environment settings:
+
+```env
+NODE_ENV=production
+MONGO_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<a long, random, unique production secret>
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://hospital-appointment-platform-front.vercel.app
+```
+
+Render supplies `PORT` automatically. Do not commit `.env` files, database credentials, JWT secrets, or real admin passwords.
+
+`CLIENT_URL` must match the deployed frontend origin exactly. The backend configuration can accept multiple comma-separated origins if needed.
+
+### Health check
+
+Open [Backend health check](https://hospital-appointment-platform.onrender.com/api/health). A healthy response should contain:
+
+```json
+{
+  "success": true,
+  "message": "API is running",
+  "data": {
+    "status": "ok",
+    "database": "connected"
+  }
+}
+```
+
+The endpoint may include additional fields such as uptime and timestamp. A `503` response indicates that the database is not connected.
+
+## Local Development Setup
+
+### Prerequisites
+
+- Node.js v18 or later (use a Node version supported by the installed Vite version)
+- npm
+- MongoDB running locally or a MongoDB Atlas connection string
 
 ### 1. Clone the repository
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/tanishqkale91-cmd/hospital-appointment-platform.git
 cd hospital-appointment-platform
 ```
 
-### 2. Backend Setup
+### 2. Set up the backend
+
 ```bash
 cd backend
-npm install
-```
-
-Create a `.env` file inside `backend/` by copying `.env.example`:
-```bash
+npm ci
 cp .env.example .env
 ```
 
-Configure `backend/.env`:
+Update `backend/.env` for your environment. For local MongoDB, the example URI is:
+
 ```env
 PORT=5000
 NODE_ENV=development
 MONGO_URI=mongodb://127.0.0.1:27017/hospital_appointments
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=<your local development secret>
 JWT_EXPIRES_IN=7d
 CLIENT_URL=http://localhost:5173
 
 ADMIN_NAME=System Admin
 ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=Admin@12345
+ADMIN_PASSWORD=<choose a strong local admin password>
 ```
 
-> **MongoDB Atlas Note**: If connecting to MongoDB Atlas (`mongodb+srv://...`), make sure your current physical IP address is whitelisted under **Network Access** in the MongoDB Atlas Console.
+Seed the initial admin account and departments if required:
 
-Seed the initial database (creates Admin account and initial departments):
 ```bash
 npm run seed
 ```
 
-Start the backend server:
+Start the backend:
+
 ```bash
-# Development mode (with nodemon)
 npm run dev
-
-# Production mode
-npm start
 ```
 
-### 3. Frontend Setup
-```bash
-cd ../frontend
-npm install
-```
+The backend defaults to port `5000`.
 
-Create a `.env` file inside `frontend/` by copying `.env.example`:
+### 3. Set up the frontend
+
+Open a second terminal from the repository root:
+
 ```bash
+cd frontend
+npm ci
 cp .env.example .env
 ```
 
-Configure `frontend/.env`:
+Set `frontend/.env`:
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-Start the Vite development server:
+Start the frontend development server:
+
 ```bash
 npm run dev
 ```
 
-Build for production:
+Vite typically serves the frontend at `http://localhost:5173`.
+
+### 4. Build the frontend
+
+From the `frontend/` directory:
+
 ```bash
 npm run build
 ```
 
----
-
 ## API Overview
 
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/health` | Public | System and DB health check |
-| `POST` | `/api/auth/register` | Public | Register a patient or doctor account |
-| `POST` | `/api/auth/login` | Public | User login (returns JWT token) |
-| `GET` | `/api/auth/me` | Authenticated | Get current authenticated user details |
-| `GET` | `/api/departments` | Public | List active hospital departments |
-| `POST` | `/api/departments` | Admin | Create a new department |
-| `GET` | `/api/doctors` | Authenticated | List/search doctors with filters |
-| `GET` | `/api/doctors/:id` | Authenticated | Get doctor details |
-| `GET` | `/api/availability/doctor/:doctorId` | Authenticated | Get doctor availability windows |
-| `GET` | `/api/availability/doctor/:doctorId/slots` | Authenticated | Get computed time slots for a date |
-| `POST` | `/api/availability` | Doctor | Publish a doctor availability window |
-| `POST` | `/api/appointments` | Patient | Book an appointment slot |
-| `GET` | `/api/appointments/my` | Patient | View patient's appointments |
-| `PATCH`| `/api/appointments/:id/cancel` | Patient/Doc/Admin| Cancel appointment & trigger waiting list assignment |
-| `PATCH`| `/api/appointments/:id/status` | Doctor/Admin | Update status to `completed` or `cancelled` |
-| `POST` | `/api/waiting-list` | Patient | Join doctor waiting list for a date |
-| `GET` | `/api/waiting-list/my` | Patient | View patient's waiting list entries |
-| `GET` | `/api/users/stats` | Admin | Get system overview statistics |
+The following endpoints are documented by the project:
 
----
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/health` | Public | API and database health |
+| `POST` | `/api/auth/register` | Public | Register a patient or doctor |
+| `POST` | `/api/auth/login` | Public | Log in and receive a JWT |
+| `GET` | `/api/auth/me` | Authenticated | Get the current user |
+| `GET` | `/api/departments` | Public | List active departments |
+| `POST` | `/api/departments` | Admin | Create a department |
+| `GET` | `/api/doctors` | Authenticated | List/search doctors |
+| `GET` | `/api/doctors/:id` | Authenticated | Get doctor details |
+| `GET` | `/api/availability/doctor/:doctorId` | Authenticated | Get doctor availability |
+| `GET` | `/api/availability/doctor/:doctorId/slots` | Authenticated | Get computed slots for a date |
+| `POST` | `/api/availability` | Doctor | Publish availability |
+| `POST` | `/api/appointments` | Patient | Book an appointment |
+| `GET` | `/api/appointments/my` | Patient | View the patient's appointments |
+| `PATCH` | `/api/appointments/:id/cancel` | Patient/Doctor/Admin | Cancel an appointment and trigger waiting-list handling |
+| `PATCH` | `/api/appointments/:id/status` | Doctor/Admin | Update appointment status |
+| `POST` | `/api/waiting-list` | Patient | Join a waiting list |
+| `GET` | `/api/waiting-list/my` | Patient | View waiting-list entries |
+| `GET` | `/api/users/stats` | Admin | Get system statistics |
 
 ## Basic Workflow
 
-1. **System Admin**: Log in with default admin credentials (`admin@example.com` / `Admin@12345`). Seed or manage departments and onboard doctors.
-2. **Doctor**: Log in with doctor credentials. Navigate to **Availability** and publish working windows (e.g. `09:00 - 12:00` with 30 min duration).
-3. **Patient**: Register a patient account, search for a doctor, select an available time slot, and book an appointment.
-4. **Duplicate Booking Test**: Attempt to book the same doctor, date, and slot with another account — verify the system rejects the booking.
-5. **Waiting List & Reassignment**: If a date is fully booked, join the waiting list. When the existing appointment is cancelled, the system automatically assigns the slot to the waiting patient.
+1. **Administrator:** Sign in with a deliberately configured admin account, manage departments, and onboard doctors.
+2. **Doctor:** Publish availability windows, for example `09:00–12:00` with 30-minute slots.
+3. **Patient:** Register, find a doctor, select an available slot, and book an appointment.
+4. **Double-booking check:** Attempt to book the same doctor/date/slot twice and verify that the duplicate is rejected.
+5. **Waiting list:** Join a waiting list for a fully booked date, then test the configured reassignment behavior after an appointment is cancelled.
+
+Do not assume example admin credentials work in production. Use the seeder's configured environment values and verify the resulting account securely.
+
+## Security Notes
+
+- Keep `.env` files and secrets out of version control.
+- Use unique production secrets and strong database credentials.
+- Restrict MongoDB Atlas network access to the narrowest practical range. Avoid leaving `0.0.0.0/0` enabled permanently.
+- Allow only trusted frontend origins through `CLIENT_URL`.
+- Never use example credentials for a public deployment.
+- Do not include real patient data in screenshots, issues, logs, or test fixtures.
+
+## Contributing
+
+1. Fork the repository or create a feature branch.
+2. Make focused changes and describe them clearly.
+3. Test relevant flows before opening a pull request.
+4. Do not commit `.env` files, credentials, or personal patient information.
+5. Include screenshots for UI changes where useful.
+
+## License
+
+Add a `LICENSE` file if the project is intended to be distributed under a specific open-source license.
