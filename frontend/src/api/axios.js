@@ -2,8 +2,22 @@ import axios from 'axios';
 
 export const TOKEN_KEY = 'hospital_token';
 
+/**
+ * Normalizes the API base URL.
+ * Ensures the base URL always points to the '/api' prefix, preventing 404s
+ * when VITE_API_URL is configured without '/api' (e.g. on Vercel deployment),
+ * and handles trailing slashes properly.
+ */
+export const normalizeApiUrl = (url) => {
+  const fallback = 'http://localhost:5000/api';
+  if (!url || typeof url !== 'string') return fallback;
+  const cleaned = url.trim().replace(/\/+$/, '');
+  if (!cleaned) return fallback;
+  return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: normalizeApiUrl(import.meta.env?.VITE_API_URL),
   headers: { 'Content-Type': 'application/json' },
 });
 
