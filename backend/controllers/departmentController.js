@@ -2,9 +2,21 @@ const Department = require('../models/Department');
 const { HttpError, asyncHandler } = require('../middlewares/errorHandler');
 const { isValidObjectId } = require('../utils/validators');
 
+const DEFAULT_DEPARTMENTS = [
+  { name: 'General Medicine', description: 'Primary care and general health concerns' },
+  { name: 'Cardiology', description: 'Heart and cardiovascular system' },
+  { name: 'Neurology', description: 'Brain, spine and nervous system' },
+  { name: 'Orthopedics', description: 'Bones, joints and muscles' },
+  { name: 'Pediatrics', description: 'Medical care for children' },
+];
+
 // GET /api/departments  (public, active only)
 const listDepartments = asyncHandler(async (req, res) => {
-  const departments = await Department.find({ isActive: true }).sort({ name: 1 });
+  let departments = await Department.find({ isActive: true }).sort({ name: 1 });
+  if (departments.length === 0 && (await Department.countDocuments()) === 0) {
+    await Department.insertMany(DEFAULT_DEPARTMENTS, { ordered: false }).catch(() => {});
+    departments = await Department.find({ isActive: true }).sort({ name: 1 });
+  }
   res.status(200).json({ success: true, message: 'Departments retrieved', data: departments });
 });
 
