@@ -30,9 +30,14 @@ const run = async () => {
   }
 
   for (const [name, description] of DEPARTMENTS) {
-    if (!(await Department.exists({ name }))) {
-      await Department.create({ name, description });
+    const existing = await Department.findOne({
+      name: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+    });
+    if (!existing) {
+      await Department.create({ name, description, isActive: true });
       console.log(`Department created: ${name}`);
+    } else {
+      console.log(`Department already exists: ${existing.name}`);
     }
   }
   await mongoose.disconnect();

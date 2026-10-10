@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import * as departmentApi from '../../api/departmentApi';
 import Alert from '../../components/common/Alert';
@@ -16,13 +16,30 @@ export default function Register() {
     name: '', email: '', password: '', confirm: '', role: 'patient', phone: '', departmentId: '', specialization: '',
   });
   const [departments, setDepartments] = useState([]);
+  const [departmentsLoading, setDepartmentsLoading] = useState(true);
+  const [departmentsError, setDepartmentsError] = useState('');
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    departmentApi.listDepartments().then((res) => setDepartments(res.data)).catch(() => {});
+  const fetchDepartments = useCallback(async () => {
+    setDepartmentsLoading(true);
+    setDepartmentsError('');
+    try {
+      const res = await departmentApi.listDepartments();
+      const list = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
+      setDepartments(list);
+    } catch (err) {
+      setDepartmentsError(getErrorMessage(err) || 'Failed to load departments');
+      setDepartments([]);
+    } finally {
+      setDepartmentsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [fetchDepartments]);
 
   if (user) return <Navigate to={homeFor(user.role)} replace />;
 
@@ -82,12 +99,50 @@ export default function Register() {
         {isDoctor && (
           <>
             <FormField label="Department" id="departmentId" error={errors.departmentId}>
-              <select id="departmentId" className={cls('departmentId')} value={form.departmentId} onChange={set('departmentId')}>
-                <option value="">Select department</option>
-                {departments.map((d) => (
-                  <option key={d._id} value={d._id}>{d.name}</option>
-                ))}
-              </select>
+              {departmentsLoading ? (
+                <select id="departmentId" className="input text-slate-400" disabled>
+                  <option value="">Loading departments...</option>
+                </select>
+              ) : departmentsError ? (
+                <div className="space-y-1">
+                  <select id="departmentId" className="input input-error" disabled>
+                    <option value="">Error loading departments</option>
+                  </select>
+                  <p className="text-xs text-rose-600 flex items-center justify-between">
+                    <span>{departmentsError}</span>
+                    <button
+                      type="button"
+                      onClick={fetchDepartments}
+                      className="font-medium text-brand-700 underline hover:text-brand-800 ml-2"
+                    >
+                      Retry
+                    </button>
+                  </p>
+                </div>
+              ) : departments.length === 0 ? (
+                <div className="space-y-1">
+                  <select id="departmentId" className="input input-error" disabled>
+                    <option value="">No departments available</option>
+                  </select>
+                  <p className="text-xs text-amber-600">
+                    No active departments found. Please contact an administrator.
+                  </p>
+                </div>
+              ) : (
+                <select
+                  id="departmentId"
+                  className={cls('departmentId')}
+                  value={form.departmentId}
+                  onChange={set('departmentId')}
+                >
+                  <option value="">Select department</option>
+                  {departments.map((d) => (
+                    <option key={d._id} value={d._id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </FormField>
             <FormField label="Specialization" id="specialization" error={errors.specialization}>
               <input id="specialization" className={cls('specialization')} value={form.specialization} onChange={set('specialization')} />
